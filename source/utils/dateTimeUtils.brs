@@ -89,92 +89,88 @@ function getDateTime(liveIn) as String
 	end if
 end function
 
-function getLiveInCountDown(livein as Object)
-
-	videoStartDateTime = CreateObject("roDateTime")
-	videoStartDateTime.FromISO8601String(livein)
-	videoStartDateTime.ToLocalTime()
-	eventStartUnixTimeStamp = videoStartDateTime.AsSeconds()
-
-	currentDateTime = CreateObject("roDateTime")
-	currentDateTime.Mark()
-	currentDateTime.ToLocalTime()
-	seconds = eventStartUnixTimeStamp - currentDateTime.AsSeconds()
-
-	return seconds
-end function
-
-Function getCountdownString(seconds As Integer) As String
-
-	if seconds <> invalid
-		hours = Int(seconds / 3600) 
-	end if
-	
-	if hours <> invalid AND seconds <> invalid
-		if hours < 1
-			minutes = Int(seconds / 60)
-			seconds = seconds MOD 60
-			days = 0
-		else if hours > 23
-			days = Int(hours/24)
-			if days <> invalid
-				hours = hours - (days*24)
-			end if
-			minutes = Int(seconds / 60)
-
-			if hours <> invalid AND minutes <> invalid AND days <> invalid
-				minutes = minutes - (hours*60) - (days*1440)
-				seconds = seconds - (hours*3600) - (minutes*60) - (days*86400)
-			end if 
-		else 
-			minutes = Int(seconds / 60)
-			if minutes <> invalid 
-				minutes = minutes - (hours*60)
-		    	seconds = seconds - (hours*3600) - (minutes*60)
-			end if 
-			days = 0
-		end if
-	end if
-
-	if days <> invalid 
-		strOfDays = days.toStr()
-	else 
-		strOfDays = ""
-	end if
-	
-	if hours <> invalid 
-		strOfHours = hours.toStr()
-	else 
-		strOfMins = ""
-	end if
-	
-	if hours <> invalid
-		strOfMins = minutes.toStr()
-	else 
-		strOfMins = ""
-	end if
-
-	if seconds <> invalid
-		strOfSeconds = seconds.toStr()
-	else 
-		strOfSeconds = ""
-	end if
-	
-	timeLeft =  "Live in " + strOfDays + "d " + strOfHours + "h " + strOfMins + "m " + strOfSeconds + "s" 
-	if seconds = 0 and minutes = 0 and hours = 0 and days = 0
-	   timeLeft = "Live Now"
-	else	
-	   timeLeft =  "Live in " + strOfDays + "d " + strOfHours + "h " + strOfMins + "m " + strOfSeconds + "s"  
-	end if
-
-	return timeLeft
-End Function
-
-
 function valid(item) as Boolean
     return type(item) <> "Invalid" and type(item) <> "roInvalid" and type(item) <> "<uninitialized>"
 end function
 
-function isFloat(item) as Boolean
-    return type(item) = "Float" or type(item) = "roFloat"
+
+function setDateime()
+    
+ m.currentDateTime = ""
+   yr =  m.timer.GetYear()
+   year = toStr(yr)
+   if yr < 10
+      year = "0" + year
+   end if
+
+   mnth = m.timer.GetMonth()
+   month = toStr(mnth)
+    if mnth < 10
+      month = "0" + month
+    end if
+
+   dy = m.timer.GetDayOfMonth()
+   day = toStr(dy)
+    if dy < 10
+      day = "0" + day
+    end if
+
+   m.hr = m.timer.GetHours()
+    m.hours = toStr(m.hr)
+    if m.hr < 10
+        m.hours = "0" + m.hours
+    end if
+
+   m.mn = m.timer.GetMinutes()
+   m.minutes = toStr(m.mn)
+   if m.mn < 10
+        m.minutes = "0" + m.minutes
+   end if
+
+   se = m.timer.GetSeconds()
+   seconds = toStr(se)
+ 
+   m.currentDateTime = year + "-" + month + "-" + day + "T" + m.hours + ":" + m.minutes 
 end function
+
+
+function matchIsLive() as boolean
+
+  if valid(m.UpcomingMatches) 
+    for eventsId = 0 to m.UpcomingMatches.data.events.count()-1
+        startTime = m.UpcomingMatches.data.events[eventsId].start
+        endTime = m.UpcomingMatches.data.events[eventsId].end
+        startTime = left(startTime,23)
+        endTime = left(endTime,23)     
+        if isCurrent(startTime, endTime)
+          return true 
+        end if
+    end for
+    return false
+  else
+    return false
+  end if  
+end function 
+
+function isCurrent(startTime as string, endTime as string) as boolean
+  
+  startDateTime = CreateObject("roDateTime")
+  startDateTime.FromISO8601String(startTime)
+  utsStart = startDateTime.AsSeconds()
+
+  endDateTime = CreateObject("roDateTime")
+  endDateTime.FromISO8601String(endTime)
+  utsEnd = endDateTime.AsSeconds()
+ 
+  currentDateTime = CreateObject("roDateTime")
+  utsNow = currentDateTime.AsSeconds()
+
+  if utsStart <= utsNow AND utsNow <=utsEnd then
+    return true
+  else
+    return false
+  end if
+
+end function 
+
+

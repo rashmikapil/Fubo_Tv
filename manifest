@@ -1,11 +1,11 @@
-title= HeroTalkies
+Title= FUBOTV ROKU APP
 subtitle=Example of bringing up a Demo App
 mm_icon_focus_hd=pkg:/assets/images/HD.png
 mm_icon_focus_sd=pkg:/assets/images/SD.png
 mm_icon_side_hd=
 mm_icon_side_sd=
-splash_screen_hd=pkg:/assets/images/SplashScreenHD.png
-splash_screen_sd=pkg:/assets/images/SplashScreenSD.png
+splash_screen_hd=pkg:/assets/splashHD1280x720.png
+splash_screen_sd=pkg:/assets/images/splash_SD.png
 major_version=1
 minor_version=0
 build_version=00000
